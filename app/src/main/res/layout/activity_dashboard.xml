@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C0EBFF"
+    tools:context=".Dashboard.DashboardActivity">
+
+    <!-- Top Header Background -->
+    <View
+        android:id="@+id/headerBackground"
+        android:layout_width="0dp"
+        android:layout_height="260dp"
+        android:background="#0046A1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="120dp"
+        android:layout_height="240dp"
+        android:src="@drawable/nimbus_logo"
+        android:contentDescription="Nimbus Logo"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintTop_toTopOf="@id/headerBackground"
+        app:layout_constraintBottom_toBottomOf="@id/headerBackground"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Greeting -->
+    <TextView
+        android:id="@+id/greetingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dashboard"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/headerBackground" />
+
+    <TextView
+        android:id="@+id/greetingSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monitor your devices in real-time"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/greetingTitle"
+        app:layout_constraintTop_toBottomOf="@id/greetingTitle" />
+
+    <!-- Dashboard Card -->
+    <LinearLayout
+        android:id="@+id/dashboardCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_card_bg"
+        android:padding="24dp"
+        android:elevation="8dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="-80dp"
+        app:layout_constraintTop_toBottomOf="@id/headerBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Section Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Devices"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#004F4E"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Device Cards -->
+        <LinearLayout
+            android:id="@+id/cardClothesline"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="@drawable/rounded_item_bg"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_clothesline" />
+            <TextView
+                android:id="@+id/textClothesline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clothesline Status"
+                android:textSize="16sp"
+                android:textColor="#004F4E"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cardBucket"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="@drawable/rounded_item_bg"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_bucket" />
+            <TextView
+                android:id="@+id/textBucket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bucket Water Level"
+                android:textSize="16sp"
+                android:textColor="#004F4E"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cardHistory"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="@drawable/rounded_item_bg"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_history" />
+            <TextView
+                android:id="@+id/textHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rainfall History"
+                android:textSize="16sp"
+                android:textColor="#004F4E"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:itemIconTint="@color/nimbus_blue"
+        app:itemTextColor="@color/nav_gray"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FB"
+    tools:context=".Settings.SettingsActivity">
+
+    <!-- Top App Bar -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#265592"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#FFFFFF"
+            android:contentDescription="Back" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp" />
+
+    </LinearLayout>
+
+    <!-- Settings Options List -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:divider="?android:attr/dividerVertical"
+            android:showDividers="middle">
+
+            <!-- Account Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Account"
+                android:textColor="#265592"
+                android:textStyle="bold"
+                android:paddingBottom="8dp"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnEditProfile"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="Edit Profile"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnChangePassword"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="Change Password"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp" />
+
+            <!-- Device Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Device and Notifications"
+                android:textColor="#265592"
+                android:textStyle="bold"
+                android:paddingTop="24dp"
+                android:paddingBottom="8dp"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnManageDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="Manage Connected Devices"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnNotificationSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="Notification Preferences"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp" />
+
+            <!-- App Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="App"
+                android:textColor="#265592"
+                android:textStyle="bold"
+                android:paddingTop="24dp"
+                android:paddingBottom="8dp"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnPrivacyPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="Privacy Policy"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnHelpSupport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="Help and Support"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/btnAboutApp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#75C2E6"
+                android:text="About Nimbus"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp" />
+
+            <!-- Logout -->
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#265592"
+                android:text="Log Out"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
