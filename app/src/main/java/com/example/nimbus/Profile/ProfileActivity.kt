@@ -2,39 +2,56 @@ package com.example.nimbus.Profile
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.nimbus.R
-import com.example.nimbus.EditProfile.EditProfileActivity
 import android.widget.ImageView
-import android.widget.Button
+import android.widget.TextView
+import com.google.android.material.button.MaterialButton
+import androidx.appcompat.app.AppCompatActivity
+import com.example.nimbus.EditProfile.EditProfileActivity
+import com.example.nimbus.R
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity(), ProfileView {
+
+    private lateinit var presenter: ProfilePresenter
+    private lateinit var nameTextView: TextView
+    private lateinit var emailTextView: TextView
+    private lateinit var profileImageView: ImageView
+    private lateinit var backButton: ImageView
+    private lateinit var editButton: MaterialButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_profile)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        // Bind views to XML IDs
+        nameTextView = findViewById(R.id.profileName)
+        emailTextView = findViewById(R.id.profileEmail)
+        profileImageView = findViewById(R.id.profileImage)
+        backButton = findViewById(R.id.back_button)
+        editButton = findViewById(R.id.editButton)
+
+        // Initialize Presenter
+        val model = ProfileModel(this)
+        presenter = ProfilePresenter(this, model)
+
+        // Load profile
+        presenter.loadProfile()
+
+        // Back button functionality
+        backButton.setOnClickListener {
+            finish()
         }
 
-        val backBtn = findViewById<ImageView>(R.id.back_button)
-        val editBtn = findViewById<Button>(R.id.editButton)
-
-        // Handle Back Button
-        backBtn.setOnClickListener {
-            finish() // returns to previous screen
-        }
-
-        // Handle Edit Button
-        editBtn.setOnClickListener {
+        // Edit button functionality (optional, just a placeholder)
+        editButton.setOnClickListener {
             val intent = Intent(this, EditProfileActivity::class.java)
             startActivity(intent)
         }
+
+    }
+
+    override fun displayProfile(profile: Profile) {
+        nameTextView.text = profile.name
+        emailTextView.text = profile.email
+        profileImageView.setImageResource(profile.imageRes)
     }
 }

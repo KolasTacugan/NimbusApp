@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Nimbus">
         <activity
+            android:name=".Profile.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Register.RegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".ForgotPassword.ForgotPasswordActivity"
             android:exported="false" />
         <activity
@@ -22,9 +28,6 @@
             android:exported="false" />
         <activity
             android:name=".Settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Profile.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".Dashboard.DashboardActivity"

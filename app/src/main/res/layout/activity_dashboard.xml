@@ -75,7 +75,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Your Devices"
+            android:text="Quick Actions"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#004F4E"
@@ -105,28 +105,7 @@
                 android:layout_marginStart="16dp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/cardBucket"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:background="@drawable/rounded_item_bg"
-            android:layout_marginBottom="12dp">
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_bucket" />
-            <TextView
-                android:id="@+id/textBucket"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bucket Water Level"
-                android:textSize="16sp"
-                android:textColor="#004F4E"
-                android:layout_marginStart="16dp" />
-        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/cardHistory"
