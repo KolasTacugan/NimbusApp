@@ -11,6 +11,7 @@ import com.example.nimbus.Settings.SettingsActivity
 import com.example.nimbus.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.LinearLayout
+import com.example.nimbus.ClotheslineStatus.ClotheslineStatusActivity
 import com.example.nimbus.History.HistoryActivity
 
 
@@ -48,6 +49,12 @@ class DashboardActivity : AppCompatActivity() {
         val cardHistory = findViewById<LinearLayout>(R.id.cardHistory)
         cardHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
+        }
+
+        // Clothesline Status card
+        val cardClothesline = findViewById<LinearLayout>(R.id.cardClothesline)
+        cardClothesline.setOnClickListener {
+            startActivity(Intent(this, ClotheslineStatusActivity::class.java))
         }
     }
 }

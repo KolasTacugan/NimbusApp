@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C0EBFF"
+    tools:context=".ClotheslineStatus.ClotheslineStatusActivity">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clothesline Status"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#0046A1"
+                android:layout_marginBottom="16dp" />
+
+            <!-- STATUS CARD -->
+            <LinearLayout
+                android:id="@+id/statusCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/rounded_card_bg"
+                android:padding="20dp"
+                android:elevation="6dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:id="@+id/currentStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shade Status: Retracted"
+                    android:textColor="#003B66"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/rainStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rain: Not Detected"
+                    android:textColor="#003B66"
+                    android:layout_marginTop="8dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+
+            <!-- AUTOMATIC MODE SWITCH -->
+            <LinearLayout
+                android:id="@+id/automaticModeCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/rounded_item_bg"
+                android:padding="20dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Automatic Mode (Rain Sensor)"
+                    android:textSize="18sp"
+                    android:textColor="#003B66"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/autoModeToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+
+            <!-- MANUAL SHADE CONTROL -->
+            <LinearLayout
+                android:id="@+id/manualControlCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/rounded_card_bg"
+                android:padding="20dp"
+                android:elevation="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manual Shade Control"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#003B66"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Minute Picker -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Extend for:"
+                        android:textSize="16sp"
+                        android:textColor="#003B66" />
+
+                    <NumberPicker
+                        android:id="@+id/minutePicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="minutes"
+                        android:textSize="16sp"
+                        android:textColor="#003B66"
+                        android:layout_marginStart="4dp" />
+                </LinearLayout>
+
+                <!-- Extend Shade -->
+                <Button
+                    android:id="@+id/btnExtendShade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Extend Shade"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#0046A1"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Retract Shade -->
+                <Button
+                    android:id="@+id/btnRetractShade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Retract Shade"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#0077CC" />
+
+                <!-- Timer -->
+                <TextView
+                    android:id="@+id/manualOverrideTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manual Override Ends In: --"
+                    android:textSize="14sp"
+                    android:textColor="#003B66"
+                    android:layout_marginTop="16dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
