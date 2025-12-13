@@ -9,7 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.nimbus.Login.LoginActivity
+import com.example.nimbus.Profile.ProfileActivity  // Import ProfileActivity
 import com.example.nimbus.R
 
 class EditProfileActivity : AppCompatActivity(), EditProfileView {
@@ -22,7 +22,7 @@ class EditProfileActivity : AppCompatActivity(), EditProfileView {
     private lateinit var middleNameEdit: EditText
     private lateinit var lastNameEdit: EditText
     private lateinit var updateButton: Button
-    private lateinit var backButton: Button
+    private lateinit var backButton: Button  // Keep as Button since XML uses Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class EditProfileActivity : AppCompatActivity(), EditProfileView {
         middleNameEdit = findViewById(R.id.editMiddleName)
         lastNameEdit = findViewById(R.id.editLastName)
         updateButton = findViewById(R.id.saveButton)
-        backButton = findViewById(R.id.backButton)
+        backButton = findViewById(R.id.backButton)  // This is now correct
 
         // Load existing user data
         presenter.loadUserData()
@@ -60,19 +60,23 @@ class EditProfileActivity : AppCompatActivity(), EditProfileView {
                 Toast.makeText(this, "First name cannot be empty", Toast.LENGTH_SHORT).show()
             } else {
                 presenter.updateUserData(firstName, middleName, lastName)
+                // Don't navigate here - wait for onUpdateSuccess() callback
             }
         }
 
         backButton.setOnClickListener {
-            navigateToLogin()
+            // Navigate back to ProfileActivity without saving
+            navigateToProfileActivity()
         }
     }
 
-    // Navigate to LoginActivity
-    private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
+    // Navigate to ProfileActivity
+    private fun navigateToProfileActivity() {
+        val intent = Intent(this, ProfileActivity::class.java)
+        // You can use these flags if you want to clear the back stack
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
-        finish()
+        finish()  // Close this activity
     }
 
     // ===== EditProfileView Implementation =====
@@ -84,9 +88,12 @@ class EditProfileActivity : AppCompatActivity(), EditProfileView {
 
     override fun onUpdateSuccess() {
         Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+        // Navigate after successful update
+        navigateToProfileActivity()
     }
 
     override fun onUpdateFailure() {
         Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
+        // Stay on the same screen on failure so user can try again
     }
 }
