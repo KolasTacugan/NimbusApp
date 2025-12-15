@@ -62,7 +62,6 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-
             <!-- AUTOMATIC MODE SWITCH -->
             <LinearLayout
                 android:id="@+id/automaticModeCard"
@@ -90,9 +89,11 @@
             </LinearLayout>
 
 
-            <!-- MANUAL SHADE CONTROL -->
+            <!-- MANUAL SHADE CONTROL CARD -->
             <LinearLayout
                 android:id="@+id/manualControlCard"
+                android:layout_marginBottom="24dp"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -109,20 +110,65 @@
                     android:textColor="#003B66"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Retract Shade Button -->
+                <Button
+                    android:id="@+id/btnRetractShade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Retract Shade"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#0077CC" />
+
+                <!-- Remaining Time Display -->
+                <TextView
+                    android:id="@+id/remainingTimeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Remaining Time: --:--"
+                    android:textSize="16sp"
+                    android:textColor="#003B66"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Timer -->
+
+            </LinearLayout>
+
+            <!-- EXTEND TIMER CARD -->
+            <LinearLayout
+                android:id="@+id/extendTimerCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/rounded_card_bg"
+                android:elevation="6dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="Extend Timer"
+                    android:textColor="#003B66"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
                 <!-- Minute Picker -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="16dp"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Extend for:"
-                        android:textSize="16sp"
-                        android:textColor="#003B66" />
+                        android:textColor="#003B66"
+                        android:textSize="16sp" />
 
                     <NumberPicker
                         android:id="@+id/minutePicker"
@@ -133,41 +179,20 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
                         android:text="minutes"
-                        android:textSize="16sp"
                         android:textColor="#003B66"
-                        android:layout_marginStart="4dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Extend Shade -->
+                <!-- Extend Shade Button -->
                 <Button
                     android:id="@+id/btnExtendShade"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Extend Shade"
-                    android:textColor="#FFFFFF"
                     android:backgroundTint="#0046A1"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Retract Shade -->
-                <Button
-                    android:id="@+id/btnRetractShade"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Retract Shade"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="#0077CC" />
-
-                <!-- Timer -->
-                <TextView
-                    android:id="@+id/manualOverrideTimer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Manual Override Ends In: --"
-                    android:textSize="14sp"
-                    android:textColor="#003B66"
-                    android:layout_marginTop="16dp" />
-
+                    android:text="Extend Time"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
 
         </LinearLayout>

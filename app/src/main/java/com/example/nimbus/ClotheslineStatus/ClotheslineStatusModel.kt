@@ -16,8 +16,11 @@ class ClotheslineStatusModel {
         val automaticMode: Boolean = true,
         val manualShade: Int = 30,
         val rainStatus: Boolean = true,
-        val shadeStatus: Boolean = true
+        val shadeStatus: Boolean = true,
+        val countdownModel: CountdownModel? = null
     )
+
+    class CountdownModel(var secondsLeft: Long = 0L)
 
     interface StatusListener {
         fun onStatusChanged(status: ClotheslineStatus)
@@ -27,6 +30,39 @@ class ClotheslineStatusModel {
     interface OperationListener {
         fun onSuccess()
         fun onError(error: String)
+    }
+
+    fun startCountdown(minutes: Int, listener: OperationListener) {
+        val seconds = minutes * 60L
+        val countdownModel = CountdownModel(seconds)
+
+        clotheslineRef.child("countdownModel").setValue(countdownModel)
+            .addOnSuccessListener {
+                listener.onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                listener.onError("Failed to start countdown: ${exception.message}")
+            }
+    }
+
+    fun updateCountdown(secondsLeft: Long, listener: OperationListener) {
+        clotheslineRef.child("countdownModel").child("secondsLeft").setValue(secondsLeft)
+            .addOnSuccessListener {
+                listener.onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                listener.onError("Failed to update countdown: ${exception.message}")
+            }
+    }
+
+    fun cancelCountdown(listener: OperationListener) {
+        clotheslineRef.child("countdownModel").removeValue()
+            .addOnSuccessListener {
+                listener.onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                listener.onError("Failed to cancel countdown: ${exception.message}")
+            }
     }
 
     // Create/Update the entire status
@@ -63,7 +99,6 @@ class ClotheslineStatusModel {
     }
 
     // Update individual fields
-
     fun updateAutomaticMode(isAutomatic: Boolean, listener: OperationListener) {
         clotheslineRef.child("automaticMode").setValue(isAutomatic)
             .addOnSuccessListener {
@@ -117,19 +152,22 @@ class ClotheslineStatusModel {
 
     // Remove real-time listener (important to prevent memory leaks)
     fun removeStatusListener() {
-        // Since we're adding anonymous listeners, we need to store reference to remove them
-        // In a real implementation, you might want to store the ValueEventListener
+        // Implementation depends on how you store the ValueEventListener
     }
 
     companion object {
-        // Helper method to get readable rain status
         fun getRainStatusText(isRaining: Boolean): String {
             return if (isRaining) "Raining" else "Not Detected"
         }
 
-        // Helper method to get readable shade status
         fun getShadeStatusText(isRetracted: Boolean): String {
-            return if (isRetracted) "Retracted" else "Closed"
+            return if (isRetracted) "Retracted" else "Extended"
+        }
+
+        fun formatTimeFromSeconds(totalSeconds: Long): String {
+            val minutes = totalSeconds / 60
+            val seconds = totalSeconds % 60
+            return String.format("%02d:%02d", minutes, seconds)
         }
     }
 }

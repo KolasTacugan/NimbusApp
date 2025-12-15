@@ -1,11 +1,13 @@
 package com.example.nimbus.ClotheslineStatus
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,40 +18,30 @@ class ClotheslineStatusActivity : AppCompatActivity(),
     ClotheslineStatusPresenter.ClotheslineStatusView {
 
     private lateinit var presenter: ClotheslineStatusPresenter
-
-    // UI Components
     private lateinit var currentStatusText: TextView
     private lateinit var rainStatusText: TextView
     private lateinit var autoModeToggle: Switch
     private lateinit var minutePicker: NumberPicker
     private lateinit var btnExtendShade: Button
     private lateinit var btnRetractShade: Button
-    private lateinit var manualOverrideTimer: TextView
-
-    // Loading overlay
+    private lateinit var remainingTimeText: TextView
     private lateinit var loadingOverlay: View
 
-    // Current state
+    private var countdownTimer: CountDownTimer? = null
     private var currentShadeStatus = false
     private var currentAutomaticMode = true
     private var currentRainStatus = false
     private var currentManualShade = 30
+    private var currentCountdownSeconds: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_clothesline_status)
 
-        // Initialize presenter
         presenter = ClotheslineStatusPresenter(this)
-
-        // Initialize UI components
         initViews()
-
-        // Set up UI listeners
         setupListeners()
-
-        // Initialize presenter to start listening for real-time updates
         presenter.initialize()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -60,88 +52,172 @@ class ClotheslineStatusActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
-        // Initialize TextViews
         currentStatusText = findViewById(R.id.currentStatusText)
         rainStatusText = findViewById(R.id.rainStatusText)
-        manualOverrideTimer = findViewById(R.id.manualOverrideTimer)
-
-        // Initialize Switch
+        remainingTimeText = findViewById(R.id.remainingTimeText)
         autoModeToggle = findViewById(R.id.autoModeToggle)
-
-        // Initialize NumberPicker
         minutePicker = findViewById(R.id.minutePicker)
         minutePicker.minValue = 1
         minutePicker.maxValue = 120
         minutePicker.value = 30
-
-        // Initialize Buttons
         btnExtendShade = findViewById(R.id.btnExtendShade)
         btnRetractShade = findViewById(R.id.btnRetractShade)
-
-        // Initialize loading overlay (you'll need to add this to your XML)
         loadingOverlay = findViewById(R.id.loadingOverlay)
+
+        remainingTimeText.visibility = View.GONE
     }
 
     private fun setupListeners() {
-        // Automatic mode toggle listener
         autoModeToggle.setOnCheckedChangeListener { _, isChecked ->
             presenter.onAutomaticModeSwitchToggled(isChecked)
+            updateShadeButtonsEnabledState(!isChecked)
         }
 
-        // Manual shade extend button
         btnExtendShade.setOnClickListener {
+            if (autoModeToggle.isChecked) return@setOnClickListener
             val minutes = minutePicker.value
-            presenter.onManualShadeTimeSelected(minutes)
-            // Note: The actual extension should be handled via shade status update
+            addToTimer(minutes)
         }
 
-        // Manual shade retract button
         btnRetractShade.setOnClickListener {
-            presenter.toggleShadeStatus(currentShadeStatus)
+            if (autoModeToggle.isChecked) return@setOnClickListener
+            if (currentShadeStatus) { // If shade is retracted, extend it
+                presenter.toggleShadeStatus(true)
+                setDefaultExtendTimer(10)
+            } else { // If shade is extended, retract it
+                presenter.toggleShadeStatus(false)
+                stopCountdownTimer()
+                remainingTimeText.visibility = View.GONE
+            }
         }
 
-        // Minute picker value change listener
         minutePicker.setOnValueChangedListener { _, _, newVal ->
-            // You could implement real-time preview or debounced update here
+            // Optional: Implement real-time preview here
         }
     }
 
-    // ===== View Interface Implementation =====
+
+    private fun setDefaultExtendTimer(minutes: Int) {
+        val totalSeconds = minutes * 60L
+        currentCountdownSeconds = totalSeconds
+        updateTimerDisplay(totalSeconds)
+        startCountdownTimer(totalSeconds)
+        presenter.startCountdown(minutes)
+
+        Toast.makeText(
+            this@ClotheslineStatusActivity,
+            "Shade extended for $minutes minutes",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun addToTimer(minutes: Int) {
+        val additionalSeconds = minutes * 60L
+        val newTotalSeconds = currentCountdownSeconds + additionalSeconds
+        currentCountdownSeconds = newTotalSeconds
+        updateTimerDisplay(newTotalSeconds)
+
+        // Restart countdown with new total time
+        startCountdownTimer(newTotalSeconds)
+        presenter.startCountdown(minutes)
+
+        Toast.makeText(
+            this@ClotheslineStatusActivity,
+            "Added $minutes minutes to timer",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun startCountdownTimer(totalSeconds: Long) {
+        stopCountdownTimer()
+
+        if (totalSeconds <= 0) return
+
+        countdownTimer = object : CountDownTimer(totalSeconds * 1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = millisUntilFinished / 1000
+                currentCountdownSeconds = secondsLeft
+                updateTimerDisplay(secondsLeft)
+
+                if (secondsLeft % 30 == 0L) {
+                    presenter.updateCountdown(secondsLeft)
+                }
+            }
+
+            override fun onFinish() {
+                currentCountdownSeconds = 0
+                updateTimerDisplay(0)
+                presenter.cancelCountdown()
+
+                if (!currentShadeStatus) {
+                    presenter.toggleShadeStatus(false)
+                    Toast.makeText(
+                        this@ClotheslineStatusActivity,
+                        "Timer finished. Shade retracted.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateRetractShadeButtonText(true)
+                }
+            }
+        }.start()
+    }
+
+    private fun stopCountdownTimer() {
+        countdownTimer?.cancel()
+        countdownTimer = null
+    }
+
+    private fun updateShadeButtonsEnabledState(enabled: Boolean) {
+        btnExtendShade.isEnabled = enabled
+        btnRetractShade.isEnabled = enabled
+    }
+
+    private fun updateRetractShadeButtonText(isRetracted: Boolean) {
+        runOnUiThread {
+            btnRetractShade.text = if (isRetracted) "Extend Shade" else "Retract Shade"
+            // Disable Extend Time button when shade is retracted
+            btnExtendShade.isEnabled = !isRetracted
+            // Disable Extend Shade button when shade is retracted
+            btnRetractShade.isEnabled = !isRetracted
+        }
+    }
+
+    private fun updateTimerDisplay(secondsLeft: Long) {
+        runOnUiThread {
+            if (secondsLeft > 0) {
+                val formattedTime = ClotheslineStatusModel.formatTimeFromSeconds(secondsLeft)
+                remainingTimeText.text = "Remaining Time: $formattedTime"
+                remainingTimeText.visibility = View.VISIBLE
+            } else {
+                remainingTimeText.visibility = View.GONE
+            }
+        }
+    }
 
     override fun showLoading() {
         loadingOverlay.visibility = View.VISIBLE
-        // Disable interactive elements while loading
         autoModeToggle.isEnabled = false
-        btnExtendShade.isEnabled = false
-        btnRetractShade.isEnabled = false
+        updateShadeButtonsEnabledState(false)
         minutePicker.isEnabled = false
     }
 
     override fun hideLoading() {
         loadingOverlay.visibility = View.GONE
-        // Re-enable interactive elements
         autoModeToggle.isEnabled = true
-        btnExtendShade.isEnabled = true
-        btnRetractShade.isEnabled = true
-        minutePicker.isEnabled = true
+        updateShadeButtonsEnabledState(!currentAutomaticMode)
+        minutePicker.isEnabled = !currentAutomaticMode
     }
 
     override fun showAutomaticMode(isAutomatic: Boolean) {
         runOnUiThread {
             currentAutomaticMode = isAutomatic
             autoModeToggle.isChecked = isAutomatic
+            updateShadeButtonsEnabledState(!isAutomatic)
+            minutePicker.isEnabled = !isAutomatic
 
-            // Update UI state based on automatic mode
             if (isAutomatic) {
-                minutePicker.isEnabled = false
-                btnExtendShade.isEnabled = false
-                btnRetractShade.isEnabled = false
-                manualOverrideTimer.text = "Automatic Mode Active"
-            } else {
-                minutePicker.isEnabled = true
-                btnExtendShade.isEnabled = true
-                btnRetractShade.isEnabled = true
-                manualOverrideTimer.text = "Manual Override Active"
+                remainingTimeText.visibility = View.GONE
+                stopCountdownTimer()
             }
         }
     }
@@ -150,9 +226,6 @@ class ClotheslineStatusActivity : AppCompatActivity(),
         runOnUiThread {
             currentManualShade = minutes
             minutePicker.value = minutes
-
-            // Update timer display
-            manualOverrideTimer.text = "Manual Override: $minutes minutes"
         }
     }
 
@@ -160,13 +233,13 @@ class ClotheslineStatusActivity : AppCompatActivity(),
         runOnUiThread {
             currentRainStatus = isRaining
             rainStatusText.text = "Rain: $statusText"
-
-            // Visual feedback based on rain status
-            if (isRaining) {
-                rainStatusText.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
-            } else {
-                rainStatusText.setTextColor(resources.getColor(R.color.dark_blue, null))
-            }
+            rainStatusText.setTextColor(
+                if (isRaining) {
+                    resources.getColor(android.R.color.holo_red_dark, null)
+                } else {
+                    resources.getColor(R.color.dark_blue, null)
+                }
+            )
         }
     }
 
@@ -174,65 +247,81 @@ class ClotheslineStatusActivity : AppCompatActivity(),
         runOnUiThread {
             currentShadeStatus = isRetracted
             currentStatusText.text = "Shade Status: $statusText"
+            currentStatusText.setTextColor(
+                if (isRetracted) {
+                    resources.getColor(android.R.color.holo_green_dark, null)
+                } else {
+                    resources.getColor(android.R.color.holo_orange_dark, null)
+                }
+            )
 
-            // Update button states based on shade status
+            // Set button text
+            btnRetractShade.text = if (isRetracted) "Extend Shade" else "Retract Shade"
+            btnExtendShade.text = "Extend Time"
+
             if (isRetracted) {
-                currentStatusText.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-                btnExtendShade.text = "Extend Shade"
-                btnRetractShade.text = "Retracted"
-                btnRetractShade.isEnabled = false
-                btnExtendShade.isEnabled = true
-            } else {
-                currentStatusText.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
-                btnExtendShade.text = "Extended"
-                btnRetractShade.text = "Retract Shade"
+                // Disable Extend Time button and hide timer
                 btnExtendShade.isEnabled = false
+                btnExtendShade.isClickable = false
+                remainingTimeText.visibility = View.GONE
+
+                // Retract button should also be disabled
+                btnRetractShade.isEnabled = false
+            } else {
+                // Shade is extended → enable Extend button (if manual mode) and Retract button
+                btnExtendShade.isEnabled = !currentAutomaticMode
+                btnExtendShade.isClickable = true
                 btnRetractShade.isEnabled = true
             }
         }
     }
 
+
     override fun showFullStatus(status: ClotheslineStatusModel.ClotheslineStatus) {
         runOnUiThread {
-            // Update all UI elements with the complete status
             showAutomaticMode(status.automaticMode)
             showManualShade(status.manualShade)
             showRainStatus(status.rainStatus, ClotheslineStatusModel.getRainStatusText(status.rainStatus))
             showShadeStatus(status.shadeStatus, ClotheslineStatusModel.getShadeStatusText(status.shadeStatus))
+            updateShadeButtonsEnabledState(!status.automaticMode)
 
-            // Log or show toast with full status (optional)
-            // Toast.makeText(this, "Status updated", Toast.LENGTH_SHORT).show()
+            status.countdownModel?.let { countdownModel ->
+                currentCountdownSeconds = countdownModel.secondsLeft
+                updateTimerDisplay(currentCountdownSeconds)
+
+                if (currentCountdownSeconds > 0 && !status.automaticMode) {
+                    startCountdownTimer(currentCountdownSeconds)
+                } else {
+                    stopCountdownTimer()
+                }
+            } ?: run {
+                stopCountdownTimer()
+                remainingTimeText.visibility = View.GONE
+            }
         }
     }
 
     override fun showError(message: String) {
         runOnUiThread {
             hideLoading()
-            // Show error message - you can use Toast, Snackbar, or an error TextView
-            android.widget.Toast.makeText(
+            Toast.makeText(
                 this@ClotheslineStatusActivity,
                 "Error: $message",
-                android.widget.Toast.LENGTH_LONG
+                Toast.LENGTH_LONG
             ).show()
-
-            // You could also show the error in a TextView in your layout
-            // errorTextView.text = message
-            // errorTextView.visibility = View.VISIBLE
         }
     }
 
     override fun onAutomaticModeUpdated(success: Boolean) {
         runOnUiThread {
             if (!success) {
-                // Revert toggle if update failed
                 autoModeToggle.isChecked = currentAutomaticMode
                 showError("Failed to update automatic mode")
             } else {
-                // Show success feedback
-                android.widget.Toast.makeText(
+                Toast.makeText(
                     this@ClotheslineStatusActivity,
                     if (currentAutomaticMode) "Automatic mode enabled" else "Manual mode enabled",
-                    android.widget.Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -241,19 +330,14 @@ class ClotheslineStatusActivity : AppCompatActivity(),
     override fun onManualShadeUpdated(success: Boolean) {
         runOnUiThread {
             if (!success) {
-                // Revert to previous value if update failed
                 minutePicker.value = currentManualShade
                 showError("Failed to update manual shade time")
             } else {
-                // Show success feedback
-                android.widget.Toast.makeText(
+                Toast.makeText(
                     this@ClotheslineStatusActivity,
                     "Manual shade time set to $currentManualShade minutes",
-                    android.widget.Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT
                 ).show()
-
-                // Update timer display
-                manualOverrideTimer.text = "Manual Override: $currentManualShade minutes remaining"
             }
         }
     }
@@ -263,34 +347,28 @@ class ClotheslineStatusActivity : AppCompatActivity(),
             if (!success) {
                 showError("Failed to update rain status")
             }
-            // No need to revert UI since rain status is typically sensor-driven
         }
     }
 
     override fun onShadeStatusUpdated(success: Boolean) {
         runOnUiThread {
             if (!success) {
-                // Revert shade status if update failed
                 showShadeStatus(currentShadeStatus,
                     ClotheslineStatusModel.getShadeStatusText(currentShadeStatus))
                 showError("Failed to update shade status")
             } else {
-                // Show success feedback
                 val statusText = if (currentShadeStatus) "retracted" else "extended"
-                android.widget.Toast.makeText(
+                Toast.makeText(
                     this@ClotheslineStatusActivity,
                     "Shade $statusText successfully",
-                    android.widget.Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }
     }
 
-    // ===== Lifecycle Methods =====
-
     override fun onResume() {
         super.onResume()
-        // Re-initialize if needed
         if (!::presenter.isInitialized) {
             presenter = ClotheslineStatusPresenter(this)
             presenter.initialize()
@@ -299,23 +377,7 @@ class ClotheslineStatusActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         super.onDestroy()
-        // Clean up presenter resources
+        stopCountdownTimer()
         presenter.onDestroy()
-    }
-
-    // ===== Helper Methods =====
-
-    private fun startTimerDisplay(minutes: Int) {
-        // This is a placeholder for timer functionality
-        // You would typically use a CountDownTimer or Handler here
-        manualOverrideTimer.text = "Manual Override: $minutes:00 remaining"
-    }
-
-    private fun updateButtonStates() {
-        // Update button enabled states based on current mode
-        val isManualMode = !currentAutomaticMode
-        btnExtendShade.isEnabled = isManualMode && currentShadeStatus
-        btnRetractShade.isEnabled = isManualMode && !currentShadeStatus
-        minutePicker.isEnabled = isManualMode
     }
 }

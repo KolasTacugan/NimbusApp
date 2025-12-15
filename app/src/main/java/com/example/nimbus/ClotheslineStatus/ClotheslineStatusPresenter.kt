@@ -5,7 +5,6 @@ class ClotheslineStatusPresenter(
     private val model: ClotheslineStatusModel = ClotheslineStatusModel()
 ) {
 
-    // View interface that the Activity must implement
     interface ClotheslineStatusView {
         fun showLoading()
         fun hideLoading()
@@ -21,19 +20,15 @@ class ClotheslineStatusPresenter(
         fun onShadeStatusUpdated(success: Boolean)
     }
 
-    // Initialize presenter and start listening for real-time updates
     fun initialize() {
         view.showLoading()
         startListeningToStatus()
     }
 
-    // Start real-time listening to status changes
     private fun startListeningToStatus() {
         model.getCurrentStatus(object : ClotheslineStatusModel.StatusListener {
             override fun onStatusChanged(status: ClotheslineStatusModel.ClotheslineStatus) {
                 view.hideLoading()
-
-                // Update all views with current status
                 view.showAutomaticMode(status.automaticMode)
                 view.showManualShade(status.manualShade)
                 view.showRainStatus(status.rainStatus, ClotheslineStatusModel.getRainStatusText(status.rainStatus))
@@ -48,7 +43,48 @@ class ClotheslineStatusPresenter(
         })
     }
 
-    // Toggle automatic mode
+    fun startCountdown(minutes: Int) {
+        view.showLoading()
+        model.startCountdown(minutes, object : ClotheslineStatusModel.OperationListener {
+            override fun onSuccess() {
+                view.hideLoading()
+                view.onManualShadeUpdated(true)
+            }
+
+            override fun onError(error: String) {
+                view.hideLoading()
+                view.showError("Failed to start countdown: $error")
+                view.onManualShadeUpdated(false)
+            }
+        })
+    }
+
+    fun updateCountdown(secondsLeft: Long) {
+        model.updateCountdown(secondsLeft, object : ClotheslineStatusModel.OperationListener {
+            override fun onSuccess() {
+                // Countdown updated successfully
+            }
+
+            override fun onError(error: String) {
+                view.showError("Failed to update countdown: $error")
+            }
+        })
+    }
+
+    fun cancelCountdown() {
+        view.showLoading()
+        model.cancelCountdown(object : ClotheslineStatusModel.OperationListener {
+            override fun onSuccess() {
+                view.hideLoading()
+            }
+
+            override fun onError(error: String) {
+                view.hideLoading()
+                view.showError("Failed to cancel countdown: $error")
+            }
+        })
+    }
+
     fun toggleAutomaticMode(currentMode: Boolean) {
         val newMode = !currentMode
         view.showLoading()
@@ -64,13 +100,11 @@ class ClotheslineStatusPresenter(
                 view.hideLoading()
                 view.showError("Failed to toggle automatic mode: $error")
                 view.onAutomaticModeUpdated(false)
-                // Revert to previous state in UI
                 view.showAutomaticMode(currentMode)
             }
         })
     }
 
-    // Update automatic mode with specific value
     fun updateAutomaticMode(isAutomatic: Boolean) {
         view.showLoading()
 
@@ -89,11 +123,9 @@ class ClotheslineStatusPresenter(
         })
     }
 
-    // Update manual shade time
     fun updateManualShade(minutes: Int) {
         view.showLoading()
 
-        // Validate input
         if (minutes < 0) {
             view.hideLoading()
             view.showError("Invalid minutes value. Must be positive.")
@@ -116,7 +148,6 @@ class ClotheslineStatusPresenter(
         })
     }
 
-    // Update rain status (typically called from sensor updates)
     fun updateRainStatus(isRaining: Boolean) {
         view.showLoading()
 
@@ -135,7 +166,6 @@ class ClotheslineStatusPresenter(
         })
     }
 
-    // Update shade status
     fun updateShadeStatus(isRetracted: Boolean) {
         view.showLoading()
 
@@ -154,16 +184,11 @@ class ClotheslineStatusPresenter(
         })
     }
 
-    // Get current status once (without real-time updates)
     fun getCurrentStatusOnce() {
         view.showLoading()
-
-        // This method would require adding a similar method to the Model
-        // For now, we rely on real-time updates from initialize()
         view.hideLoading()
     }
 
-    // Update all status at once (for batch operations)
     fun updateAllStatus(
         automaticMode: Boolean,
         manualShade: Int,
@@ -192,34 +217,32 @@ class ClotheslineStatusPresenter(
             override fun onError(error: String) {
                 view.hideLoading()
                 view.showError("Failed to update all status: $error")
-                // Update UI with previous values would need to be handled
             }
         })
     }
 
-    // Handle manual shade time picker selection
     fun onManualShadeTimeSelected(minutes: Int) {
         updateManualShade(minutes)
+        startCountdown(minutes)
     }
 
-    // Handle automatic mode switch toggle
     fun onAutomaticModeSwitchToggled(isChecked: Boolean) {
         updateAutomaticMode(isChecked)
+        if (isChecked) {
+            cancelCountdown()
+        }
     }
 
-    // Handle rain sensor update
     fun onRainSensorUpdate(isWet: Boolean) {
         updateRainStatus(isWet)
     }
 
-    // Handle shade control
     fun toggleShadeStatus(currentStatus: Boolean) {
         updateShadeStatus(!currentStatus)
+        cancelCountdown()
     }
 
-    // Clean up resources when activity is destroyed
     fun onDestroy() {
-        // The model should have a method to remove listeners
-        // model.removeStatusListener()
+        // Cleanup if needed
     }
 }
