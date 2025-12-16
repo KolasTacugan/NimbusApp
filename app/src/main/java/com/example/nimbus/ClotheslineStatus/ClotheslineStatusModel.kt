@@ -17,6 +17,7 @@ class ClotheslineStatusModel {
         val manualShade: Int = 30,
         val rainStatus: Boolean = true,
         val shadeStatus: Boolean = true,
+        val extendButton: Boolean = false, // Added extendButton field
         val countdownModel: CountdownModel? = null
     )
 
@@ -139,6 +140,17 @@ class ClotheslineStatusModel {
             }
     }
 
+    // Added: Update extendButton field in Firebase
+    fun updateExtendButton(extend: Boolean, listener: OperationListener) {
+        clotheslineRef.child("extendButton").setValue(extend)
+            .addOnSuccessListener {
+                listener.onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                listener.onError("Failed to update extend button: ${exception.message}")
+            }
+    }
+
     // Read single value without real-time updates
     fun getSingleValue(childPath: String, listener: (Any?) -> Unit) {
         clotheslineRef.child(childPath).get()
@@ -163,7 +175,6 @@ class ClotheslineStatusModel {
         fun getShadeStatusText(isExtended: Boolean): String {
             return if (isExtended) "Extended" else "Retracted"
         }
-
 
         fun formatTimeFromSeconds(totalSeconds: Long): String {
             val minutes = totalSeconds / 60

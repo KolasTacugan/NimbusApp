@@ -68,6 +68,11 @@ class ClotheslineStatusActivity : AppCompatActivity(),
     }
 
     private fun setupListeners() {
+        // Add click listener to currentStatusText
+        currentStatusText.setOnClickListener {
+            onStatusTextClicked()
+        }
+
         autoModeToggle.setOnCheckedChangeListener { _, isChecked ->
             presenter.onAutomaticModeSwitchToggled(isChecked)
             updateShadeButtonsEnabledState(!isChecked)
@@ -85,30 +90,89 @@ class ClotheslineStatusActivity : AppCompatActivity(),
             when (btnRetractShade.text.toString()) {
                 "Extend Shade" -> {
                     // Extend shade
-                    presenter.updateShadeStatus(true)
-
-                    val minutes = minutePicker.value
-                    setDefaultExtendTimer(minutes)
+                    handleExtendShade()
                 }
 
                 "Retract Shade" -> {
                     // Retract shade
-                    presenter.updateShadeStatus(false)
-
-                    presenter.cancelCountdown()
-                    stopCountdownTimer()
-                    currentCountdownSeconds = 0
-                    remainingTimeText.visibility = View.GONE
+                    handleRetractShade()
                 }
             }
         }
-
 
         minutePicker.setOnValueChangedListener { _, _, newVal ->
             // Optional: Implement real-time preview here
         }
     }
 
+    private fun onStatusTextClicked() {
+        // Check if automatic mode is enabled - if so, don't allow manual control via status text
+        if (currentAutomaticMode) {
+            Toast.makeText(
+                this@ClotheslineStatusActivity,
+                "Manual control disabled in automatic mode",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        // Get the current display text (only the part before ":")
+        val displayText = currentStatusText.text.toString()
+
+        // Check if the shade is currently extended or retracted based on the color
+        // Orange color indicates extended, Green indicates retracted
+        val isCurrentlyExtended = when (currentStatusText.currentTextColor) {
+            resources.getColor(android.R.color.holo_orange_dark, null) -> true
+            resources.getColor(android.R.color.holo_green_dark, null) -> false
+            else -> currentShadeStatus // fallback to stored state
+        }
+
+        if (isCurrentlyExtended) {
+            // Currently extended - retract it
+            handleRetractShade()
+        } else {
+            // Currently retracted - extend it
+            handleExtendShade()
+        }
+    }
+
+    private fun handleExtendShade() {
+        // Extend shade: pass true for both extendButton AND shadeStatus
+        // First update extendButton
+        presenter.updateExtendButton(true)
+
+        // Then update shadeStatus
+        presenter.updateShadeStatus(true)
+
+        val minutes = minutePicker.value
+        setDefaultExtendTimer(minutes)
+
+        Toast.makeText(
+            this@ClotheslineStatusActivity,
+            "Shade extended for $minutes minutes",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun handleRetractShade() {
+        // Retract shade: pass false for both extendButton AND shadeStatus
+        // First update extendButton
+        presenter.updateExtendButton(false)
+
+        // Then update shadeStatus
+        presenter.updateShadeStatus(false)
+
+        presenter.cancelCountdown()
+        stopCountdownTimer()
+        currentCountdownSeconds = 0
+        remainingTimeText.visibility = View.GONE
+
+        Toast.makeText(
+            this@ClotheslineStatusActivity,
+            "Shade retracted",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 
     private fun setDefaultExtendTimer(minutes: Int) {
         val totalSeconds = minutes * 60L
@@ -116,12 +180,6 @@ class ClotheslineStatusActivity : AppCompatActivity(),
         updateTimerDisplay(totalSeconds)
         startCountdownTimer(totalSeconds)
         presenter.startCountdown(minutes)
-
-        Toast.makeText(
-            this@ClotheslineStatusActivity,
-            "Shade extended for $minutes minutes",
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     private fun addToTimer(minutes: Int) {
@@ -163,6 +221,8 @@ class ClotheslineStatusActivity : AppCompatActivity(),
                 presenter.cancelCountdown()
 
                 if (!currentShadeStatus) {
+                    // When timer finishes, update both extendButton AND shadeStatus to false
+                    presenter.updateExtendButton(false)
                     presenter.updateShadeStatus(false)
                     Toast.makeText(
                         this@ClotheslineStatusActivity,
@@ -286,8 +346,6 @@ class ClotheslineStatusActivity : AppCompatActivity(),
         }
     }
 
-
-
     override fun showFullStatus(status: ClotheslineStatusModel.ClotheslineStatus) {
         runOnUiThread {
             showAutomaticMode(status.automaticMode)
@@ -374,6 +432,15 @@ class ClotheslineStatusActivity : AppCompatActivity(),
                     "Shade $statusText successfully",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+        }
+    }
+
+    // Add this method to handle extendButton updates
+    override fun onExtendButtonUpdated(success: Boolean) {
+        runOnUiThread {
+            if (!success) {
+                showError("Failed to update extend button")
             }
         }
     }

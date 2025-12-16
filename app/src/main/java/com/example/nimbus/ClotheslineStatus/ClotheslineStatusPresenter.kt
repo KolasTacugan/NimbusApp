@@ -18,6 +18,7 @@ class ClotheslineStatusPresenter(
         fun onManualShadeUpdated(success: Boolean)
         fun onRainStatusUpdated(success: Boolean)
         fun onShadeStatusUpdated(success: Boolean)
+        fun onExtendButtonUpdated(success: Boolean) // Added this method
     }
 
     fun initialize() {
@@ -166,7 +167,40 @@ class ClotheslineStatusPresenter(
         })
     }
 
+    fun updateExtendButton(extend: Boolean) {
+        view.showLoading()
 
+        model.updateExtendButton(extend, object : ClotheslineStatusModel.OperationListener {
+            override fun onSuccess() {
+                view.hideLoading()
+                view.onExtendButtonUpdated(true)
+            }
+
+            override fun onError(error: String) {
+                view.hideLoading()
+                view.showError("Failed to update extend button: $error")
+                view.onExtendButtonUpdated(false)
+            }
+        })
+    }
+
+    fun updateShadeStatus(isExtended: Boolean) {
+        view.showLoading()
+
+        model.updateShadeStatus(isExtended, object : ClotheslineStatusModel.OperationListener {
+            override fun onSuccess() {
+                view.hideLoading()
+                view.showShadeStatus(isExtended, ClotheslineStatusModel.getShadeStatusText(isExtended))
+                view.onShadeStatusUpdated(true)
+            }
+
+            override fun onError(error: String) {
+                view.hideLoading()
+                view.showError("Failed to update shade status: $error")
+                view.onShadeStatusUpdated(false)
+            }
+        })
+    }
 
     fun getCurrentStatusOnce() {
         view.showLoading()
@@ -220,26 +254,6 @@ class ClotheslineStatusPresenter(
     fun onRainSensorUpdate(isWet: Boolean) {
         updateRainStatus(isWet)
     }
-
-    fun updateShadeStatus(isExtended: Boolean) {
-        view.showLoading()
-
-        model.updateShadeStatus(isExtended, object : ClotheslineStatusModel.OperationListener {
-            override fun onSuccess() {
-                view.hideLoading()
-                view.showShadeStatus(isExtended, ClotheslineStatusModel.getShadeStatusText(isExtended))
-                view.onShadeStatusUpdated(true)
-            }
-
-            override fun onError(error: String) {
-                view.hideLoading()
-                view.showError("Failed to update shade status: $error")
-                view.onShadeStatusUpdated(false)
-            }
-        })
-    }
-
-
 
     fun onDestroy() {
         // Cleanup if needed
