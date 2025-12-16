@@ -57,7 +57,9 @@ class ClotheslineStatusModel {
     }
 
     fun cancelCountdown(listener: OperationListener) {
-        clotheslineRef.child("countdownModel").removeValue()
+        clotheslineRef.child("countdownModel")
+            .child("secondsLeft")
+            .setValue(0L)
             .addOnSuccessListener {
                 listener.onSuccess()
             }
@@ -65,6 +67,7 @@ class ClotheslineStatusModel {
                 listener.onError("Failed to cancel countdown: ${exception.message}")
             }
     }
+
 
     // Create/Update the entire status
     fun updateClotheslineStatus(status: ClotheslineStatus, listener: OperationListener) {

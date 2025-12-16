@@ -35,6 +35,9 @@ class ClotheslineStatusPresenter(
                 view.showRainStatus(status.rainStatus, ClotheslineStatusModel.getRainStatusText(status.rainStatus))
                 view.showShadeStatus(status.shadeStatus, ClotheslineStatusModel.getShadeStatusText(status.shadeStatus))
                 view.showFullStatus(status)
+
+                checkCountdownAndReset(status.countdownModel?.secondsLeft ?: 0, status.shadeStatus)
+
             }
 
             override fun onError(error: String) {
@@ -70,6 +73,13 @@ class ClotheslineStatusPresenter(
                 view.showError("Failed to update countdown: $error")
             }
         })
+    }
+    fun checkCountdownAndReset(secondsLeft: Long, currentShadeStatus: Boolean) {
+        if (secondsLeft <= 0 && currentShadeStatus) {
+            // Shade is currently extended but countdown is 0 → retract it and reset extendButton
+            updateShadeStatus(false)
+            updateExtendButton(false)
+        }
     }
 
     fun cancelCountdown() {
