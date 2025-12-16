@@ -58,18 +58,7 @@ class ForgotPasswordActivity : AppCompatActivity(), ForgotPasswordView {
         emailEditText = findViewById(R.id.emailEditText)
         submitButton = findViewById(R.id.submitButton)
         backToLoginText = findViewById(R.id.backToLoginText)
-
-        // Create and add progress bar programmatically
-        progressBar = ProgressBar(this).apply {
-            visibility = View.GONE
-            layoutParams = android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        }
-
-        // Add progress bar to layout
-        findViewById<android.widget.LinearLayout>(R.id.main).addView(progressBar)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun setupListeners() {
