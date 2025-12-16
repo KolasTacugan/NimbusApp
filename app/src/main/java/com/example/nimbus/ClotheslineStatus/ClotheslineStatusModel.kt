@@ -160,9 +160,10 @@ class ClotheslineStatusModel {
             return if (isRaining) "Raining" else "Not Detected"
         }
 
-        fun getShadeStatusText(isRetracted: Boolean): String {
-            return if (isRetracted) "Retracted" else "Extended"
+        fun getShadeStatusText(isExtended: Boolean): String {
+            return if (isExtended) "Extended" else "Retracted"
         }
+
 
         fun formatTimeFromSeconds(totalSeconds: Long): String {
             val minutes = totalSeconds / 60

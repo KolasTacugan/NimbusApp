@@ -166,23 +166,7 @@ class ClotheslineStatusPresenter(
         })
     }
 
-    fun updateShadeStatus(isRetracted: Boolean) {
-        view.showLoading()
 
-        model.updateShadeStatus(isRetracted, object : ClotheslineStatusModel.OperationListener {
-            override fun onSuccess() {
-                view.hideLoading()
-                view.showShadeStatus(isRetracted, ClotheslineStatusModel.getShadeStatusText(isRetracted))
-                view.onShadeStatusUpdated(true)
-            }
-
-            override fun onError(error: String) {
-                view.hideLoading()
-                view.showError("Failed to update shade status: $error")
-                view.onShadeStatusUpdated(false)
-            }
-        })
-    }
 
     fun getCurrentStatusOnce() {
         view.showLoading()
@@ -237,10 +221,25 @@ class ClotheslineStatusPresenter(
         updateRainStatus(isWet)
     }
 
-    fun toggleShadeStatus(currentStatus: Boolean) {
-        updateShadeStatus(!currentStatus)
-        cancelCountdown()
+    fun updateShadeStatus(isExtended: Boolean) {
+        view.showLoading()
+
+        model.updateShadeStatus(isExtended, object : ClotheslineStatusModel.OperationListener {
+            override fun onSuccess() {
+                view.hideLoading()
+                view.showShadeStatus(isExtended, ClotheslineStatusModel.getShadeStatusText(isExtended))
+                view.onShadeStatusUpdated(true)
+            }
+
+            override fun onError(error: String) {
+                view.hideLoading()
+                view.showError("Failed to update shade status: $error")
+                view.onShadeStatusUpdated(false)
+            }
+        })
     }
+
+
 
     fun onDestroy() {
         // Cleanup if needed

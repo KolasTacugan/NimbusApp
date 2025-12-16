@@ -81,15 +81,28 @@ class ClotheslineStatusActivity : AppCompatActivity(),
 
         btnRetractShade.setOnClickListener {
             if (autoModeToggle.isChecked) return@setOnClickListener
-            if (currentShadeStatus) { // If shade is retracted, extend it
-                presenter.toggleShadeStatus(true)
-                setDefaultExtendTimer(10)
-            } else { // If shade is extended, retract it
-                presenter.toggleShadeStatus(false)
-                stopCountdownTimer()
-                remainingTimeText.visibility = View.GONE
+
+            when (btnRetractShade.text.toString()) {
+                "Extend Shade" -> {
+                    // Extend shade
+                    presenter.updateShadeStatus(true)
+
+                    val minutes = minutePicker.value
+                    setDefaultExtendTimer(minutes)
+                }
+
+                "Retract Shade" -> {
+                    // Retract shade
+                    presenter.updateShadeStatus(false)
+
+                    presenter.cancelCountdown()
+                    stopCountdownTimer()
+                    currentCountdownSeconds = 0
+                    remainingTimeText.visibility = View.GONE
+                }
             }
         }
+
 
         minutePicker.setOnValueChangedListener { _, _, newVal ->
             // Optional: Implement real-time preview here
@@ -150,7 +163,7 @@ class ClotheslineStatusActivity : AppCompatActivity(),
                 presenter.cancelCountdown()
 
                 if (!currentShadeStatus) {
-                    presenter.toggleShadeStatus(false)
+                    presenter.updateShadeStatus(false)
                     Toast.makeText(
                         this@ClotheslineStatusActivity,
                         "Timer finished. Shade retracted.",
@@ -243,38 +256,36 @@ class ClotheslineStatusActivity : AppCompatActivity(),
         }
     }
 
-    override fun showShadeStatus(isRetracted: Boolean, statusText: String) {
+    override fun showShadeStatus(isExtended: Boolean, statusText: String) {
         runOnUiThread {
-            currentShadeStatus = isRetracted
+            currentShadeStatus = isExtended
             currentStatusText.text = "Shade Status: $statusText"
+
             currentStatusText.setTextColor(
-                if (isRetracted) {
-                    resources.getColor(android.R.color.holo_green_dark, null)
-                } else {
+                if (isExtended)
                     resources.getColor(android.R.color.holo_orange_dark, null)
-                }
+                else
+                    resources.getColor(android.R.color.holo_green_dark, null)
             )
 
-            // Set button text
-            btnRetractShade.text = if (isRetracted) "Extend Shade" else "Retract Shade"
-            btnExtendShade.text = "Extend Time"
-
-            if (isRetracted) {
-                // Disable Extend Time button and hide timer
+            if (isExtended) {
+                // Shade is EXTENDED → allow retract + timer
+                btnRetractShade.text = "Retract Shade"
+                btnExtendShade.isEnabled = !currentAutomaticMode
+                btnExtendShade.isClickable = true
+            } else {
+                // Shade is RETRACTED → allow extend only
+                btnRetractShade.text = "Extend Shade"
                 btnExtendShade.isEnabled = false
                 btnExtendShade.isClickable = false
                 remainingTimeText.visibility = View.GONE
-
-                // Retract button should also be disabled
-                btnRetractShade.isEnabled = false
-            } else {
-                // Shade is extended → enable Extend button (if manual mode) and Retract button
-                btnExtendShade.isEnabled = !currentAutomaticMode
-                btnExtendShade.isClickable = true
-                btnRetractShade.isEnabled = true
+                stopCountdownTimer()
             }
+
+            btnRetractShade.isEnabled = !currentAutomaticMode
         }
     }
+
 
 
     override fun showFullStatus(status: ClotheslineStatusModel.ClotheslineStatus) {
