@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.nimbus.EditProfile.EditProfileActivity
+import com.example.nimbus.History.HistoryActivity
 import com.example.nimbus.Login.LoginActivity
 import com.example.nimbus.R
 
@@ -25,31 +26,20 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        // Back button functionality
         val backButton = findViewById<ImageView>(R.id.backButton)
         backButton.setOnClickListener {
             finish() // Go back to previous activity
         }
 
-        // Edit Profile card functionality
-        val editProfileCard = findViewById<LinearLayout>(R.id.btnEditProfile)
-        editProfileCard.setOnClickListener {
-            // TODO: Navigate to Edit Profile Activity
-            // Uncomment when EditProfileActivity is created:
-            // val intent = Intent(this, EditProfileActivity::class.java)
-            // startActivity(intent)
-
-            // Temporary toast message
-            Toast.makeText(this, "Edit Profile clicked", Toast.LENGTH_SHORT).show()
+        val editBtn = findViewById<LinearLayout>(R.id.btnEditProfile)
+        editBtn.setOnClickListener {
+            startActivity(Intent(this, EditProfileActivity::class.java))
         }
 
         // Logout button functionality
         val logoutButton = findViewById<Button>(R.id.btnLogout)
         logoutButton.setOnClickListener {
             // Optional: Clear user session or shared preferences here if needed
-            // Example:
-            // val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-            // sharedPreferences.edit().clear().apply()
 
             // Go back to LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
