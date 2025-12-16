@@ -36,7 +36,11 @@ class ClotheslineStatusPresenter(
                 view.showShadeStatus(status.shadeStatus, ClotheslineStatusModel.getShadeStatusText(status.shadeStatus))
                 view.showFullStatus(status)
 
-                checkCountdownAndReset(status.countdownModel?.secondsLeft ?: 0, status.shadeStatus)
+                checkCountdownAndReset(
+                    status.countdownModel?.secondsLeft ?: 0,
+                    status.shadeStatus,
+                    status.automaticMode
+                )
 
             }
 
@@ -74,13 +78,17 @@ class ClotheslineStatusPresenter(
             }
         })
     }
-    fun checkCountdownAndReset(secondsLeft: Long, currentShadeStatus: Boolean) {
-        if (secondsLeft <= 0 && currentShadeStatus) {
-            // Shade is currently extended but countdown is 0 → retract it and reset extendButton
+    fun checkCountdownAndReset(
+        secondsLeft: Long,
+        currentShadeStatus: Boolean,
+        automaticMode: Boolean
+    ) {
+        if (!automaticMode && secondsLeft <= 0 && currentShadeStatus) {
             updateShadeStatus(false)
             updateExtendButton(false)
         }
     }
+
 
     fun cancelCountdown() {
         view.showLoading()

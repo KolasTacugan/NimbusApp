@@ -150,7 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="Extend Timer"
+                    android:text="Set Timer"
                     android:textColor="#003B66"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -166,7 +166,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Extend for:"
+                        android:text="Set for:"
                         android:textColor="#003B66"
                         android:textSize="16sp" />
 
@@ -191,7 +191,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="#0046A1"
-                    android:text="Extend Time"
+                    android:text="Set Time"
                     android:textColor="#FFFFFF" />
             </LinearLayout>
 
